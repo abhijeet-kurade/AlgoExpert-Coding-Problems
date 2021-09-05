@@ -1,10 +1,13 @@
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AlgoExpert {
 
+    public static void main(String[] args) {
+
+    }
 
 }
-
 
 class AlgoExpertArrays{
 
@@ -752,6 +755,454 @@ class AlgoExpertArrays{
 
 
     }
+
+
+}
+
+class AlgoExpertStack{
+
+    public static void main(String[] args) {
+
+    }
+    static class MinMaxStack {
+
+        Stack<int[]> stack ;
+        int size;
+
+        public MinMaxStack(){
+            this.stack = new Stack<>();
+            this.size = 0;
+        }
+        public int peek() {
+            return stack.peek()[0];
+        }
+
+        public int pop() {
+            this.size -= 1;
+            return stack.pop()[0];
+        }
+
+        public void push(Integer number) {
+            int curr_min = this.size != 0 ? getMin() : Integer.MAX_VALUE;
+            int curr_max = this.size != 0 ? getMax() : Integer.MIN_VALUE;
+            this.size += 1;
+            stack.push(new int[]{ number, Math.min(curr_min, number), Math.max(curr_max, number) });
+        }
+
+        public int getMin() {
+            return stack.peek()[1];
+        }
+
+        public int getMax() {
+            return stack.peek()[2];
+        }
+    }
+    public static boolean balancedBrackets(String str) {
+        Map<Character, Character> bracks =  new HashMap<>();
+        bracks.put('(', ')');
+        bracks.put('[', ']');
+        bracks.put('{', '}');
+
+        Set<Character> chars = new HashSet<>(bracks.keySet());
+        for(char c : bracks.keySet())  chars.add(bracks.get(c));
+
+        Stack<Character> stack = new Stack<>();
+        for(char c : str.toCharArray()){
+            if(!chars.contains(c)) continue;
+            if(bracks.get(c) != null){
+                stack.push(c);
+            }
+            else {
+                if(stack.isEmpty()) return false;
+                if(bracks.get(stack.pop()) != c) return false;
+            }
+        }
+        return stack.size() == 0;
+    }
+    public ArrayList<Integer> sunsetViews(int[] buildings, String direction) {
+
+        int len = buildings.length;
+        if(direction.equals("EAST")) {
+            for(int i=0; i<(len / 2); i++) {
+                int temp = buildings[i];
+                buildings[i] = buildings[len-1-i];
+                buildings[len-1-i] = temp;
+            }
+        }
+        ArrayList<Integer> views = new ArrayList<>();
+        int min_bld = Integer.MIN_VALUE;
+
+        for(int i=0; i<len; i++){
+            if(min_bld < buildings[i]){
+                views.add(i);
+                min_bld = buildings[i];
+            }
+        }
+        if(direction.equals("EAST")) {
+            int len1 = views.size();
+            Collections.reverse(views);
+            for(int i=0; i<len1; i++){
+                views.set(i, len-1-i);
+            }
+        }
+        return views;
+    }
+    class SortStack{
+        public void insertIntoStack(ArrayList<Integer> stack, int val){
+            int len = stack.size();
+            if(len ==  0 || stack.get(len-1) <= val){
+                stack.add(val);
+                return;
+            }
+            int value = stack.remove(len-1);
+            insertIntoStack(stack, val);
+            stack.add(value);
+            return;
+        }
+        public ArrayList<Integer> sortStack(ArrayList<Integer> stack) {
+        int len = stack.size();
+        if(len == 0) return stack;
+        int val = stack.remove(len-1);
+        sortStack(stack);
+        insertIntoStack(stack, val);
+        return stack;
+    }
+    }
+    public int[] nextGreaterElement(int[] array) {
+        int len = array.length;
+        int[] nextGrtEle = new int[len];
+        for(int i=0; i<len; i++) nextGrtEle[i] = -1;
+        Stack<Integer> stack = new Stack<>();
+        for(int idx = 2 * len -1; idx>=0; idx++){
+            int ind = idx % len;
+            while(!stack.isEmpty()){
+                if(array[ind] >= stack.peek()){
+                    stack.pop();
+                }
+                else {
+                    nextGrtEle[ind] = stack.peek();
+                    break;
+                }
+            }
+            stack.push(array[ind]);
+        }
+        return nextGrtEle;
+    }
+
+    public static String shortenPath(String path) {
+        boolean startWithPath = path.charAt(0) == '/';
+        String[] tokensArr = path.split("/");
+        List<String> tokensList = Arrays.asList(tokensArr);
+        List<String> filteredTokens = tokensList.stream().filter(token -> (token.length() > 0 && !token.equals(".")))
+                .collect(Collectors.toList());
+
+        Stack<String> stack = new Stack<>();
+        if(startWithPath) stack.push("");
+
+        for(String token : filteredTokens){
+            if(token.equals("..")){
+                if( stack.isEmpty() || stack.peek().equals(".."))  stack.push(token);
+                else if( !stack.peek().equals("") )  stack.pop();
+            }
+            else stack.push(token);
+        }
+        if(stack.size() == 1 && stack.peek().equals("")) return "/";
+        return String.join("/", stack);
+    }
+
+    public int largestRectangleUnderSkyline(ArrayList<Integer> bldgs) {
+        int len = bldgs.size();
+        int[] buildings = new int[len];
+        int index = 0;
+        for(int num : bldgs) buildings[index++] = num;
+
+        Stack<Integer> stack = new Stack<>();
+        int[] left = new int[len];
+        for(int i=0; i<len; i++){
+            while(!stack.isEmpty()){
+                if(buildings[stack.peek()] >= buildings[i])
+                    stack.pop();
+                else break;
+            }
+            left[i] = stack.isEmpty() ? -1 : stack.peek();
+            stack.push(i);
+        }
+
+        stack.clear();
+        int[] right = new int[len];
+        for(int i=len-1; i>=0; i--){
+            while(!stack.isEmpty()){
+                if(buildings[stack.peek()] >= buildings[i])
+                    stack.pop();
+                else break;
+            }
+            right[i] = stack.isEmpty() ? len : stack.peek();
+            stack.push(i);
+        }
+
+        int max_area = 0;
+        for(int i=0; i<len; i++){
+            int curr_area = buildings[i] * (right[i] - left[i] -1);
+            max_area = Math.max(max_area, curr_area);
+        }
+        return max_area;
+    }
+
+
+}
+
+class AlgoExpertLinkedList{
+    public static class LinkedList {
+        public int value;
+        public LinkedList next;
+
+        public LinkedList(int value) {
+            this.value = value;
+            this.next = null;
+        }
+    }
+    public LinkedList removeDuplicatesFromLinkedList(LinkedList head) {
+        if(head == null) return head;
+        LinkedList node = head;
+        while (node.next != null){
+            if(node.value == node.next.value)
+                node.next = node.next.next;
+            else
+                node = node.next;
+        }
+        return head;
+    }
+
+    public static LinkedList findLoop(LinkedList head) {
+        LinkedList slow = head;
+        LinkedList fast = head.next;
+        while (slow != fast){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        slow = head;
+        fast = fast.next;
+        while (slow != fast){
+            slow = slow.next;
+            fast = fast.next;
+        }
+        return slow;
+    }
+
+    public static void removeKthNodeFromEnd(LinkedList head, int k) {
+        LinkedList start = head;
+        LinkedList end = head.next;
+
+        for(int i=1; i<k; i++) end = end.next;
+
+        if (end == null){
+            head.value = head.next.value;
+            head.next = head.next.next;
+            return;
+        }
+
+        while (end.next != null){
+            start = start.next;
+            end = end.next;
+        }
+
+        start.next = start.next.next;
+    }
+
+    public LinkedList sumOfLinkedLists(LinkedList linkedListOne, LinkedList linkedListTwo) {
+        LinkedList one = linkedListOne;
+        LinkedList two = linkedListTwo;
+        int carry = 0;
+        LinkedList head = new LinkedList(0);
+        LinkedList node = head;
+        while (one != null || two != null || carry != 0){
+            int num_one = one != null ? one.value : 0;
+            int num_two = two != null ? two.value : 0;
+
+            int sum = num_one + num_two + carry;
+            int unit = sum % 10;
+            carry = sum / 10;
+
+            LinkedList curr = new LinkedList(unit);
+            node.next = curr;
+            node = curr;
+
+            one = one != null ? one.next : null;
+            two = two != null ? two.next : null;
+
+        }
+        return  head.next;
+    }
+
+    public static LinkedList reverseLinkedList(LinkedList head) {
+        LinkedList node = head;
+        LinkedList prev = null;
+        while (node.next != null){
+            LinkedList temp = node.next;
+            node.next = prev;
+            prev = node;
+            node = temp;
+        }
+        node.next = prev;
+        return node;
+    }
+
+    public static LinkedList mergeLinkedLists(LinkedList headOne, LinkedList headTwo) {
+        LinkedList head = new LinkedList(0);
+        LinkedList curr = head;
+        while (headOne != null || headTwo != null){
+            int one = headOne != null ? headOne.value : Integer.MAX_VALUE;
+            int two = headTwo != null ? headTwo.value : Integer.MAX_VALUE;
+            if(one <= two){
+                curr.next = headOne;
+                headOne = headOne.next;
+            }
+            else {
+                curr.next = headTwo;
+                headTwo = headTwo.next;
+            }
+            curr = curr.next;
+        }
+        return head.next;
+    }
+    public static LinkedList mergeLinkedLists1(LinkedList headOne, LinkedList headTwo) {
+        LinkedList previous = null;
+        LinkedList one = headOne;
+        LinkedList two = headTwo;
+
+        while (one != null && two != null){
+            if(one.value < two.value){
+                previous = one;
+                one = one.next;
+            }
+            else{
+                if (previous != null) previous.next = two;
+                previous = two;
+                two = two.next;
+                previous.next = one;
+            }
+        }
+
+        if(one == null) previous.next = two;
+        return headOne.value < headTwo.value ? headOne : headTwo;
+    }
+
+
+
+
+    static class Node {
+        public int value;
+        public Node prev;
+        public Node next;
+
+        public Node(int value) {
+            this.value = value;
+        }
+    }
+    static class DoublyLinkedList {
+        public Node head;
+        public Node tail;
+
+        public DoublyLinkedList(){
+            this.head = null;
+            this.tail = null;
+        }
+
+        public void setHead(Node node) {
+            if(this.head == null){
+                this.head = node;
+                this.tail = node;
+            }
+            node.next = this.head;
+            this.head.prev = node;
+            this.head = node;
+        }
+
+        public void setTail(Node node) {
+            if(this.tail == null){
+                this.head = node;
+                this.tail = node;
+            }
+            node.prev = this.tail;
+            this.tail.next = node;
+            this.tail = node;
+        }
+
+        public void insertBefore(Node node, Node nodeToInsert) {
+            if(node == this.head) setHead(nodeToInsert);
+            insertAfter(node.prev, nodeToInsert);
+        }
+
+        public void insertAfter(Node node, Node nodeToInsert) {
+            if(node == this.tail) setTail(nodeToInsert);
+            Node curr = this.head;
+
+            while(curr != node) curr = curr.next;
+
+            nodeToInsert.prev = curr;
+            nodeToInsert.next = curr.next;
+
+            curr.next.prev = nodeToInsert;
+            curr.next = nodeToInsert;
+
+        }
+
+        public void insertAtPosition(int position, Node nodeToInsert) {
+            if(position == 1) setHead(nodeToInsert);
+            int index = 2;
+            Node node = this.head;
+            while (index != position){
+                node = node.next;
+                index += 1;
+            }
+            insertAfter(node, nodeToInsert);
+        }
+
+        public void removeNodesWithValue(int value) {
+            Node node = this.head;
+            while (node != null){
+                Node next = node.next;
+                if(node.value == value) {
+                    remove(node);
+                }
+                node = next;
+            }
+        }
+
+        public void remove(Node node) {
+            if(this.head == this.tail && node == this.head){
+                this.head = null;
+                this.tail = null;
+            }
+            else if(node == this.head){
+                node.next.prev = null;
+                this.head = node.next;
+                node.next = null;
+            }
+            else if(node == this.tail){
+                node.prev.next = null;
+                this.tail = node.prev;
+                node.prev = null;
+            }
+            else{
+                node.next.prev = node.prev;
+                node.prev.next = node.next;
+                node.next = null;
+                node.prev = null;
+            }
+        }
+
+        public boolean containsNodeWithValue(int value) {
+            Node node = this.head;
+            while (node != null) {
+                if(node.value == value) return true;
+                node = node.next;
+            }
+            return false;
+        }
+    }
+
+
 
 
 }
