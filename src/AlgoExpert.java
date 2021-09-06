@@ -948,7 +948,6 @@ class AlgoExpertStack{
         return max_area;
     }
 
-
 }
 
 class AlgoExpertLinkedList{
@@ -961,6 +960,8 @@ class AlgoExpertLinkedList{
             this.next = null;
         }
     }
+
+
     public LinkedList removeDuplicatesFromLinkedList(LinkedList head) {
         if(head == null) return head;
         LinkedList node = head;
@@ -1086,6 +1087,169 @@ class AlgoExpertLinkedList{
         if(one == null) previous.next = two;
         return headOne.value < headTwo.value ? headOne : headTwo;
     }
+    public static LinkedList shiftLinkedList(LinkedList head, int k) {
+        LinkedList node = head;
+        int nodes = 1;
+
+        while (node.next != null){
+            node = node.next;
+            nodes += 1;
+        }
+
+        LinkedList tail = node;
+        tail.next = head;
+
+        int shift = k % nodes;
+        shift = shift < 0 ? shift : nodes - shift;
+        shift = Math.abs(shift);
+        System.out.println(shift);
+
+        node = tail;
+        for(int i =0; i<shift; i++){
+            node = node.next;
+        }
+
+        LinkedList new_head = node.next;
+        node.next = null;
+
+        return new_head;
+    }
+    public static LinkedList rearrangeLinkedList(LinkedList head, int k) {
+        LinkedList smallListStart = new LinkedList(0);
+        LinkedList smallListEnd = smallListStart;
+        LinkedList equalListStart = new LinkedList(0);
+        LinkedList equalListEnd = equalListStart;
+        LinkedList largeListStart = new LinkedList(0);
+        LinkedList largeListEnd = largeListStart;
+
+        LinkedList currentNode = head;
+        while(currentNode != null){
+            if(currentNode.value < k){
+                smallListEnd.next = currentNode;
+                smallListEnd = currentNode;
+            }
+            else if(currentNode.value > k){
+                largeListEnd.next = currentNode;
+                largeListEnd = currentNode;
+            }
+            else{
+                equalListEnd.next = currentNode;
+                equalListEnd = currentNode;
+            }
+            currentNode = currentNode.next;
+        }
+        if (smallListStart.next != null && equalListStart.next != null &&  largeListStart.next != null){
+            smallListEnd.next = equalListStart.next;
+            equalListEnd.next = largeListStart.next;
+        }
+        else if (smallListStart.next != null && equalListStart.next != null &&  largeListStart.next == null){
+            smallListEnd.next = equalListStart.next;
+        }
+        else if (smallListStart.next == null && equalListStart.next != null &&  largeListStart.next != null){
+            smallListStart=equalListStart;
+            equalListEnd.next = largeListStart.next;
+        }
+        else if (smallListStart.next == null && equalListStart.next == null &&  largeListStart.next != null){
+            smallListStart = largeListStart;
+        }
+        else if (smallListStart.next != null && equalListStart.next == null &&  largeListStart.next != null){
+            smallListEnd.next = largeListStart.next;
+        }
+        return smallListStart.next;
+    }
+    public static LinkedList rearrangeLinkedList1(LinkedList head, int k) {
+        LinkedList new_start = new LinkedList(0);
+        LinkedList return_start = new_start;
+
+        LinkedList dummy_start = new LinkedList(0);
+        dummy_start.next = head;
+
+        LinkedList node;
+
+        for(int i=0; i<2; i++){
+            node = dummy_start;
+            while (node.next != null){
+                boolean condition = i==0 ? node.next.value < k : node.next.value == k;
+                if(condition){
+                    new_start.next = node.next;
+                    node.next = node.next.next;
+                    new_start = new_start.next;
+                    new_start.next = null;
+                }
+                else node = node.next;
+            }
+        }
+
+        new_start.next = dummy_start.next;
+        return return_start.next;
+    }
+    public boolean linkedListPalindrome(LinkedList head) {
+        LinkedList slow = head;
+        LinkedList fast = head;
+
+        while(fast != null && fast.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        LinkedList listOne = head;
+        LinkedList listTwo;
+
+        if(slow == null) listTwo = null;
+        else{
+            LinkedList node = slow;
+            LinkedList prev = null;
+            while (node.next != null){
+                LinkedList temp = node.next;
+                node.next = prev;
+                prev = node;
+                node = temp;
+            }
+            node.next = prev;
+            listTwo = node;
+        }
+
+        while(listTwo != null){
+            if(listOne.value != listTwo.value) return false;
+            listOne = listOne.next;
+            listTwo = listTwo.next;
+        }
+        return true;
+    }
+
+    LinkedList reverseKGroup(LinkedList head, int k) {
+        LinkedList node = head;
+        for(int i=0; i<k; i++){
+            if(node == head) return head;
+            node = node.next;
+        }
+
+        LinkedList current = reverseKGroup(node, k);
+
+
+        while (node != head){
+
+        }
+        /*
+        LinkedList node = head;
+
+        for(int i=0; i<k; i++){
+            if(node == null) return head;
+            node = node.next;
+        }
+        LinkedList current = reverseKGroup(node, k);
+
+        while(head != node){
+            LinkedList next = head.next;
+            head.next = current;
+            current = head;
+            head= next;
+        }
+        return current;
+        */
+
+        return null;
+    }
+
 
 
 
@@ -1205,6 +1369,10 @@ class AlgoExpertLinkedList{
 
 
 
+}
+
+class AlgoExpertSort{
+    
 }
 
 
