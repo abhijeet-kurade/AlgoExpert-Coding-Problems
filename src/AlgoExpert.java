@@ -1778,6 +1778,38 @@ class AlgoExpertTree{
         }
     }
 
+    public static List<Integer> inOrderTraverse(BinaryTree tree, List<Integer> array) {
+
+        Stack<BinaryTree> stack = new Stack<>();
+        BinaryTree prev = null;
+        BinaryTree curr = tree;
+
+
+        while (curr != null || !stack.isEmpty()){
+            while (curr != null){
+                stack.push(curr);
+                curr = curr.left;
+            }
+            curr = stack.pop();
+            array.add(curr.value);
+            System.out.println(curr.value);
+            curr = curr.right;
+        }
+
+
+        return new ArrayList<Integer>();
+    }
+
+    public static List<Integer> preOrderTraverse(BinaryTree tree, List<Integer> array) {
+        // Write your code here.
+        return new ArrayList<Integer>();
+    }
+
+    public static List<Integer> postOrderTraverse(BinaryTree tree, List<Integer> array) {
+        // Write your code here.
+        return new ArrayList<Integer>();
+    }
+
     public static List<Integer>  brnchSums(BinaryTree node, List<Integer> sums, int sum){
         int new_sum = sum + node.value;
         if(node.left == null && node.right == null) sums.add(new_sum);
@@ -1964,9 +1996,6 @@ class AlgoExpertTree{
 
     }
 
-    public static int allKindsOfNodeDepths(BinaryTree root) {
-        return allNodes(root, 0);
-    }
 
     public  static int allNodes(BinaryTree node, int depth){
         if(node == null) return 0;
@@ -1977,7 +2006,9 @@ class AlgoExpertTree{
 
         return  left + contribution + right;
     }
-
+    public static int allKindsOfNodeDepths(BinaryTree root) {
+        return allNodes(root, 0);
+    }
     public static int allKindsOfNodeDepths1(BinaryTree root) {
         if(root == null) return 0;
         Queue<BinaryTree> queue = new LinkedList<>();
@@ -1996,6 +2027,139 @@ class AlgoExpertTree{
             }
         }
         return sum;
+    }
+
+
+    public boolean compareLeafTraversal(BinaryTree tree1, BinaryTree tree2) {
+
+        Stack<BinaryTree> stack1 = new Stack<>();
+        Stack<BinaryTree> stack2 = new Stack<>();
+
+        BinaryTree node1 = getNextLeaf(stack1,tree1);
+        BinaryTree node2 = getNextLeaf(stack2,tree2);
+        while (true){
+            if(node1 == null && node2 == null) break;
+            else if(node1 == null || node2 == null || node1.value != node2.value) return  false;
+            node1 = getNextLeaf(stack1,null);
+            node2 = getNextLeaf(stack2,null);
+        }
+        return true;
+    }
+
+    public BinaryTree getNextLeaf(Stack<BinaryTree> stack, BinaryTree current ){
+
+        while (current != null || !stack.isEmpty()){
+            while (current != null){
+                stack.push(current);
+                current = current.left;
+            }
+            current = stack.pop();
+            if(current.left == null && current.right == null) return current;
+            current = current.right;
+        }
+        return null;
+    }
+
+
+}
+
+class AlgoExpertBST{
+    static class BST {
+        public int value;
+        public BST left;
+        public BST right;
+
+        public BST(int value) {
+            this.value = value;
+        }
+
+        public void insert(int value) {
+            if (value < this.value) {
+                if (left == null) {
+                    left = new BST(value);
+                } else {
+                    left.insert(value);
+                }
+            } else {
+                if (right == null) {
+                    right = new BST(value);
+                } else {
+                    right.insert(value);
+                }
+            }
+        }
+    }
+
+    public static int findClosestValueInBst(BST root, int target) {
+        if(root == null) return -1;
+        BST node = root;
+        int closest = root.value;
+
+        while (node != null){
+            closest = Math.abs(target - node.value) < Math.abs(target - closest) ? node.value : closest;
+            if(target < node.value ) node = node.left;
+            else node = node.right;
+        }
+        return closest;
+    }
+
+
+    public static BST minHeightBst(List<Integer> array) {
+        int len = array.size();
+        int[] arr = new int[len];
+        int ind = 0;
+        for(int num : array) arr[ind++] = num;
+
+        int mid = len / 2;
+        BST root = new BST(arr[mid]);
+        minHeightBST(root, arr, 0, mid-1);
+        minHeightBST(root, arr, mid+1, len-1);
+        return root;
+    }
+    public static void minHeightBST(BST node, int[] arr, int min, int max){
+        if(min > max) return;
+        int mid = min + (max - min) / 2;
+        node.insert(arr[mid]);
+        minHeightBST(node, arr, min, mid-1);
+        minHeightBST(node, arr, mid+1, max);
+    }
+    public static BST minHeightBST1(int[] arr, int min, int max){
+        if(min > max) return null;
+        int mid = min + (max - min) / 2;
+        BST node = new BST(arr[mid]);
+        node.left = minHeightBST1(arr, min, mid-1);
+        node.right = minHeightBST1(arr, mid+1, max);
+        return node;
+    }
+
+
+    public int findKthLargestValueInBst(BST tree, int k) {
+        BST curr = tree;
+        Stack<BST> stack = new Stack<>();
+        int count = 0;
+        while(curr != null || !stack.isEmpty()){
+            while (curr != null){
+                stack.push(curr);
+                curr = curr.right;
+            }
+            BST node = stack.pop();
+            count += 1;
+            if(count == k) return node.value;
+            curr = node.left;
+        }
+        return -1;
+    }
+
+
+    public static boolean validateBST(BST node, int min, int max){
+        if(node == null) return true;
+        if(node.value > min || max < node.value) return false;
+        boolean left = validateBST(node.left, min, node.value);
+        boolean right = validateBST(node.right, node.value, max);
+        return left && right;
+    }
+    public static boolean validateBst(BST tree) {
+        return validateBST(tree, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
 
