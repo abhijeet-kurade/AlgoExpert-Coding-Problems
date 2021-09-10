@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class AlgoExpert {
@@ -973,7 +974,6 @@ class AlgoExpertLinkedList{
         }
         return head;
     }
-
     public static LinkedList findLoop(LinkedList head) {
         LinkedList slow = head;
         LinkedList fast = head.next;
@@ -989,7 +989,6 @@ class AlgoExpertLinkedList{
         }
         return slow;
     }
-
     public static void removeKthNodeFromEnd(LinkedList head, int k) {
         LinkedList start = head;
         LinkedList end = head.next;
@@ -1009,7 +1008,6 @@ class AlgoExpertLinkedList{
 
         start.next = start.next.next;
     }
-
     public LinkedList sumOfLinkedLists(LinkedList linkedListOne, LinkedList linkedListTwo) {
         LinkedList one = linkedListOne;
         LinkedList two = linkedListTwo;
@@ -1034,7 +1032,6 @@ class AlgoExpertLinkedList{
         }
         return  head.next;
     }
-
     public static LinkedList reverseLinkedList(LinkedList head) {
         LinkedList node = head;
         LinkedList prev = null;
@@ -1047,7 +1044,6 @@ class AlgoExpertLinkedList{
         node.next = prev;
         return node;
     }
-
     public static LinkedList mergeLinkedLists(LinkedList headOne, LinkedList headTwo) {
         LinkedList head = new LinkedList(0);
         LinkedList curr = head;
@@ -1215,7 +1211,62 @@ class AlgoExpertLinkedList{
         }
         return true;
     }
+    public LinkedList zipLinkedList(LinkedList linkedList) {
+        if(linkedList.next == null || linkedList.next.next == null) return linkedList;
 
+        LinkedList slow = linkedList;
+        LinkedList fast = linkedList;
+        LinkedList prev = null;
+        while (fast != null && fast.next != null){
+            prev =slow;
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        LinkedList listOne = linkedList;
+        LinkedList listTwo;
+        if(fast == null){
+            listTwo = slow;
+            prev.next = null;
+        }
+        else{
+            listTwo = slow.next;
+            slow.next = null;
+        }
+
+        LinkedList current = listTwo;
+        prev = null;
+        while (current != null){
+            LinkedList temp = current.next;
+            current.next = prev;
+            prev = current;
+            current = temp;
+        }
+        listTwo = prev;
+
+        LinkedList head = new LinkedList(0);
+        current = head;
+        int turn = 0;
+        while (listOne != null || listTwo != null){
+            boolean trn = turn++ % 2 == 0 ;
+            if(trn){
+                current.next = listOne;
+                listOne = listOne.next;
+            }
+            else{
+                current.next = listTwo;
+                listTwo = listTwo.next;
+            }
+            current = current.next;
+        }
+        return head.next;
+    }
+    public void printLL(LinkedList node){
+        while (node != null){
+            System.out.print(node.value+" ");
+            node = node.next;
+        }
+        System.out.println();
+    }
     LinkedList reverseKGroup(LinkedList head, int k) {
         LinkedList node = head;
         for(int i=0; i<k; i++){
@@ -1367,12 +1418,588 @@ class AlgoExpertLinkedList{
     }
 
 
-
-
 }
 
 class AlgoExpertSort{
-    
+
+    public static void swap(int[] arr, int i, int j){
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+    public static int[] bubbleSort(int[] array) {
+        int len = array.length;
+        for(int i=len-1; i>0; i--){
+            for(int j=0;j<i; j++){
+                if(array[j]>array[j+1]){
+                    swap(array, j, j+1);
+                }
+            }
+        }
+        return array;
+    }
+
+    public static int[] insertionSort(int[] array) {
+        int len = array.length;
+        for(int i=1; i<len; i++){
+            for(int j=i+1; j>=1; j--){
+                if(array[j] > array[j-1]) break;
+                int temp = array[j];
+                array[j] = array[j-1];
+                array[j-1] = temp;
+            }
+        }
+        return array;
+    }
+
+
+
+
+
 }
+
+class AlgoExpertSearching{
+    public static int binarySearch(int[] array, int target) {
+        int start = 0;
+        int end = array.length-1;
+        while (start<=end){
+            int mid = start + (end - start) / 2;
+            if(array[mid] == target) return mid;
+            else if(array[mid] > target) end = mid - 1;
+            else start = mid + 1;
+        }
+        return -1;
+    }
+    public static int[] findThreeLargestNumbers(int[] array) {
+        int[] numbers = new int[]{Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE};
+        int len = array.length;
+
+        for(int i=0; i<len; i++){
+            if(array[i] >= numbers[2]){
+                numbers[0] = numbers[1];
+                numbers[1] = numbers[2];
+                numbers[2] = array[i];
+            }
+            else if(array[i] >= numbers[1]){
+                numbers[0] = numbers[1];
+                numbers[1] = array[i];
+
+            }
+            else if(array[i] >= numbers[0]){
+                numbers[0] = array[i];
+            }
+        }
+        return numbers;
+    }
+    public static int[] searchInSortedMatrix(int[][] matrix, int target) {
+        int height = matrix.length;
+        int width = matrix[0].length;
+
+        int row =  0;
+        int col = width-1;
+
+        while(0<=row && row<height && 0<=col && col<width ){
+            if(matrix[row][col] == target) return new int[]{row, col};
+            else if(matrix[row][col] < target) row += 1;
+            else col -= 1;
+        }
+
+        return new int[] {-1, -1};
+    }
+
+    // [45, 61, 71, 72, 73, 0, 1, 21, 33, 37] 30 -> -1
+    public static int shiftedBinarySearch(int[] array, int target) {
+        int len = array.length;
+
+        int start = 0;
+        int end = len-1;
+
+        while (start <= end){
+            int mid = start + (end - start) / 2;
+            if(array[mid] == target) return mid;
+            char sorted = array[start] <= array[mid] ? 'F' : 'S';
+            if(sorted == 'F'){
+                if(array[start] <= target && target < array[mid]) end = mid - 1;
+                else start = mid + 1;
+            }
+            else{
+                if(array[mid] < target && target <= array[end]) start = mid + 1;
+                else end = mid - 1;
+            }
+        }
+        return -1;
+    }
+
+    public static int[] searchForRange(int[] array, int target) {
+        int ind1 = equalToGreaterThan(array, target);
+        if(ind1 == -1) return new int[] {-1, -1};
+        int ind2 = equalToGreaterThan(array, target+1);
+        if(ind2 == -1) return new int[] {ind1, array.length-1};
+        return new int[] {ind1, ind2-1};
+    }
+    public static int equalToGreaterThan(int[] array, int target){
+        int len = array.length;
+        int start = 0;
+        int end = len-1;
+        int index = -1;
+        while (start <= end){
+            int mid = start + (end - start) / 2;
+            if(array[mid] >= target){
+                index = mid;
+                end = mid - 1;
+            }
+            else start = mid + 1;
+        }
+        return index;
+    }
+
+
+}
+
+class AlgoExpertHeapQue{
+    public int laptopRentals(ArrayList<ArrayList<Integer>> times) {
+        int len = times.size();
+
+        int[] start = new int[len];
+        int[] end = new int[len];
+
+        int index = 0;
+        for(ArrayList<Integer> time : times){
+            start[index] = time.get(0);
+            end[index] = time.get(1);
+            index += 1;
+        }
+
+        Arrays.sort(start);
+        Arrays.sort(end);
+
+        int current = 0;
+        int max = 0;
+        int i = 0;
+        int j = 0;
+
+        while (i<len){
+            if(start[i] < end[j]){
+                current += 1;
+                max = Math.max(max, current);
+                i += 1;
+            }
+            else {
+                j -= 1;
+                current -= 1;
+            }
+        }
+
+        return max;
+    }
+
+    static class ContinuousMedianHandler {
+        double median = 0;
+
+        PriorityQueue<Integer> low;
+        PriorityQueue<Integer> high;
+
+        public ContinuousMedianHandler(){
+            this.low = new PriorityQueue<>(new Comparator<Integer>() {
+                @Override
+                public int compare(Integer o1, Integer o2) {
+                    return o2 -o1;
+                }
+            });
+            this.high = new PriorityQueue<>();
+        }
+
+        public void insert(int number) {
+            int lenOne = this.low.size();
+            int lenTwo = this.high.size();
+
+            int low_top = this.low.peek();
+            if(lenOne == lenTwo){
+                if(lenOne == 0){
+                    this.low.add(number);
+                    this.median = this.low.peek();
+                    return;
+                }
+                if(lenOne == 0)
+                if(low_top >= number){
+                    this.low.add(number);
+                    this.median = this.low.peek();
+                }
+                else{
+                    this.high.add(number);
+                    this.median = this.high.peek();
+                    this.low.add(this.high.poll());
+                }
+            }
+            else{
+                if(lenTwo == 0){
+                    this.high.add(number);
+                    this.median = (this.low.peek() + this.high.peek()) / 2;
+                    return;
+                }
+                if(low_top >= number){
+                    this.low.add(number);
+                    this.high.add(this.low.poll());
+                }
+                else{
+                    this.high.add(number);
+                }
+                this.median = (this.low.peek() + this.high.peek()) / 2;
+            }
+        }
+
+        public double getMedian() {
+            return median;
+        }
+    }
+}
+
+class AlgoExpertHeap{
+
+    static class MinHeap {
+        List<Integer> heap = new ArrayList<Integer>();
+
+        public MinHeap(List<Integer> array) {
+            heap = buildHeap(array);
+        }
+
+        public List<Integer> buildHeap(List<Integer> array) {
+            int len = array.size()-2;
+            for(int i=len/2; i>=0; i++){
+                this.siftDown(i, array.size()-1, array);
+            }
+            return array;
+        }
+
+        public void siftDown(int currentIdx, int endIdx, List<Integer> heap) {
+            while( 2*currentIdx+1 <= endIdx){
+                int leftChildIdx = 2*currentIdx+1;
+                if(2*currentIdx+2 <= endIdx){
+                    int rightChildIdx = 2*currentIdx+2;
+                    int maxElement = Math.max(heap.get(leftChildIdx), heap.get(rightChildIdx));
+                    int swapIdx = maxElement == heap.get(leftChildIdx) ? leftChildIdx : rightChildIdx;
+                    Collections.swap(heap, currentIdx, swapIdx);
+                    currentIdx = swapIdx;
+                }
+                else{
+                    if(heap.get(leftChildIdx) > heap.get(currentIdx))
+                        Collections.swap(heap, currentIdx, leftChildIdx);
+                    break;
+                }
+            }
+        }
+
+        public void siftUp(int currentIdx, List<Integer> heap) {
+            while(currentIdx > 0){
+                int parentIdx = (currentIdx-1) / 2;
+                if(heap.get(parentIdx) <= heap.get(currentIdx)) break;
+                Collections.swap(this.heap, currentIdx, parentIdx);
+                currentIdx = parentIdx;
+            }
+        }
+
+        public int peek() {
+            return this.heap.get(0);
+        }
+
+        public int remove() {
+            Collections.swap(this.heap, 0, this.heap.size()-1);
+            int minValue = this.heap.remove(this.heap.size()-1);
+            this.siftDown(0, this.heap.size()-1, this.heap);
+            return minValue;
+        }
+
+        public void insert(int value) {
+            this.heap.add(value);
+            this.siftUp(this.heap.size()-1, this.heap);
+        }
+    }
+}
+
+class MyHeap{
+    public static void main(String[] args) {
+        int[] arr = new int[]{48, 12, 24, 7, 8, -5, 24, 391};
+        List<Integer> array = new ArrayList<>();
+        for(int num : arr) array.add(num);
+        System.out.println(array);
+        MyHeap heap = new MyHeap(array);
+        System.out.println(array);
+    }
+    List<Integer> heap = new ArrayList<>();
+    public MyHeap(List<Integer> array){
+        buildHeap(array);
+    }
+    public List<Integer> buildHeap(List<Integer> array) {
+        int len = array.size()-2;
+        for(int i=len/2; i>=0; i--){
+            this.siftDown(i, array.size()-1, array);
+        }
+        return array;
+    }
+    public void siftDown(int currentIdx, int endIdx, List<Integer> heap) {
+        int leftChildIdx = 2*currentIdx+1;
+        while( leftChildIdx <= endIdx){
+            int rightChildIdx = 2*currentIdx+2;
+            if(rightChildIdx <= endIdx){
+                int minElement = Math.min(heap.get(leftChildIdx), heap.get(rightChildIdx));
+                int swapIdx = minElement == heap.get(leftChildIdx) ? leftChildIdx : rightChildIdx;
+                if(heap.get(swapIdx) >= heap.get(currentIdx)) return;
+                Collections.swap(heap, currentIdx, swapIdx);
+                currentIdx = swapIdx;
+                leftChildIdx = 2*currentIdx+1;
+            }
+            else{
+                if(heap.get(leftChildIdx) < heap.get(currentIdx))
+                    Collections.swap(heap, currentIdx, leftChildIdx);
+                break;
+            }
+        }
+    }
+
+}
+
+class AlgoExpertTree{
+
+    static class BinaryTree {
+        public int value;
+        public BinaryTree left;
+        public BinaryTree right;
+        public BinaryTree parent;
+
+        public BinaryTree(int value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return "BinaryTree{" +
+                    "value=" + value +
+                    '}';
+        }
+    }
+
+    public static List<Integer>  brnchSums(BinaryTree node, List<Integer> sums, int sum){
+        int new_sum = sum + node.value;
+        if(node.left == null && node.right == null) sums.add(new_sum);
+
+
+        if(node.left != null) brnchSums(node.left, sums, new_sum);
+        if(node.right != null) brnchSums(node.right, sums, new_sum);
+        return sums;
+    }
+    public static List<Integer> branchSums(BinaryTree root) {
+        List<Integer> sums = new ArrayList<Integer>();
+        return brnchSums(root, sums, 0);
+    }
+
+
+    public static int nodeDepthSum(BinaryTree node, int depth){
+        if(node == null) return 0;
+        int left = nodeDepthSum(node.left, depth+1) ;
+        int right =  nodeDepthSum(node.right, depth+1) ;
+        return depth + left + right;
+
+    }
+    public static int nodeDepths(BinaryTree root) {
+        return nodeDepthSum(root, 0);
+    }
+
+
+    public static void invertBinaryTree(BinaryTree node) {
+        if(node == null) return;
+
+        BinaryTree temp = node.left;
+        node.left = node.right;
+        node.right = temp;
+
+        invertBinaryTree(node.left);
+        invertBinaryTree(node.right);
+
+    }
+
+    public int[] getDiameter(BinaryTree node){
+        if(node == null)
+            return new int[]{0, 0}; // 1. dia 2. depth
+
+        int left[] = 	getDiameter(node.left);
+        int right[] = getDiameter(node.right);
+
+        int depth = Math.max(left[1], right[1]) + 1;
+        int diameter = Math.max(Math.max(left[0], right[0]), left[1] + right[1]);
+
+        return new int[]{diameter, depth};
+    }
+    public int binaryTreeDiameter(BinaryTree tree) {
+        return getDiameter(tree)[0];
+    }
+
+    public BinaryTree findSuccessor(BinaryTree tree, BinaryTree node) {
+        if(node.right != null){
+            BinaryTree successor = node.right;
+            while(successor.left != null)
+                successor = successor.left;
+            return successor;
+        }
+        else{
+            BinaryTree node_parent = node.parent;
+            while(node_parent != null && node_parent.left != node){
+                node = node_parent;
+                node_parent = node_parent.parent;
+            }
+            return node_parent;
+        }
+    }
+
+    public int[] getHeight(BinaryTree node){
+
+        if(node == null) return new int[]{0, 0};
+
+        int[] left = getHeight(node.left) ;
+        int[] right = getHeight(node.right);
+
+        if(left[0] == 1 || right[0] == 1) return new int[]{1, 0};
+
+        if(Math.abs(left[1] - right[1]) > 1)  return new int[]{1, 0};
+
+        return new int[]{ 0, Math.max(left[1], right[1]) +1 };
+
+    }
+    public boolean heightBalancedBinaryTree(BinaryTree tree) {
+        return getHeight(tree)[0] == 0;
+    }
+
+
+
+    public static int[] maxPathSums(BinaryTree node){
+        if(node == null) return new int[]{Integer.MIN_VALUE, Integer.MIN_VALUE};
+
+        int[] left = maxPathSums(node.left);
+        int[] right = maxPathSums(node.right);
+
+        int leftPath = left[0];
+        int leftBranch = left[1];
+        int rightPath = right[0];
+        int rightBranch = right[1];
+
+        int currLeftBranch = leftBranch != Integer.MIN_VALUE ? node.value + leftBranch : Integer.MIN_VALUE;
+        int currRightBranch = rightBranch != Integer.MIN_VALUE ? node.value + rightBranch : Integer.MIN_VALUE;
+
+        int maxBranchSum = Math.max(Math.max(currLeftBranch, currRightBranch), node.value);
+
+        int currLeftRightPath ;
+
+        if(leftBranch != Integer.MIN_VALUE || rightBranch != Integer.MIN_VALUE){
+            currLeftRightPath = Integer.MIN_VALUE;
+        }
+        else{
+            currLeftRightPath = leftBranch + node.value + rightBranch;
+        }
+
+        int[] vals = new int[]{leftPath, rightPath, currLeftBranch, currRightBranch, currLeftRightPath, node.value};
+        List<Integer> lst = new ArrayList<>();
+        for(int num : vals) lst.add(num);
+        int maxPathSum = Collections.max(lst);
+
+        return new int[]{maxPathSum, maxBranchSum};
+    }
+    public static int maxPathSum(BinaryTree tree) {
+        int[] vals = maxPathSums(tree);
+        return Math.max(vals[0], vals[1]);
+    }
+
+
+    public boolean buildMap(BinaryTree node, int target, HashMap<BinaryTree, Boolean> map){
+        if(node == null) return false;
+
+        boolean left = buildMap(node.left, target, map);
+        boolean right = buildMap(node.right, target, map);
+
+        boolean thisVal = ( node.value == target ) || left || right ;
+
+        map.put(node, thisVal);
+
+        return thisVal;
+    }
+    public ArrayList<Integer> getKDistanceNodes(BinaryTree node, HashMap<BinaryTree, Boolean> map, int k, int dist,  ArrayList<Integer> nodes){
+        if(node == null) return  nodes;
+
+        int curr_dist = map.get(node) ? dist - 1 : dist + 1;
+
+        if(curr_dist == k) nodes.add(node.value);
+
+        getKDistanceNodes(node.left, map, k, curr_dist, nodes);
+        getKDistanceNodes(node.right, map, k, curr_dist, nodes);
+
+        return nodes;
+    }
+    public ArrayList<Integer> findNodesDistanceK(BinaryTree tree, int target, int k) {
+        HashMap<BinaryTree, Boolean> map = new HashMap<>();
+        buildMap(tree, target, map);
+        System.out.println(map);
+        int dist = 0;
+        for(BinaryTree nd : map.keySet()) if(map.get(nd)) dist += 1;
+        ArrayList<Integer> nodes = new ArrayList<>();
+        return getKDistanceNodes(tree, map, k, dist, nodes);
+    }
+
+    public static void iterativeInOrderTraversal(BinaryTree tree, Function<BinaryTree, Void> callback) {
+
+        BinaryTree prev = null;
+        BinaryTree curr = tree;
+
+        while (curr != null){
+            BinaryTree next = null;
+
+            if(curr.right == prev && prev != null) next = curr.parent;
+            else if(curr.left == null || prev == curr.left){
+                System.out.println(curr.value);
+                callback.apply(curr);
+                next = curr.right != null ? curr.right : curr.parent;
+            }
+            else if(curr.left != null) next = curr.left;
+
+            prev = curr;
+            curr = next;
+        }
+
+    }
+
+    public static int allKindsOfNodeDepths(BinaryTree root) {
+        return allNodes(root, 0);
+    }
+
+    public  static int allNodes(BinaryTree node, int depth){
+        if(node == null) return 0;
+        int contribution = ( depth * (depth + 1) ) / 2;
+        depth += 1;
+        int left = allNodes(node.left, depth);
+        int right = allNodes(node.right, depth);
+
+        return  left + contribution + right;
+    }
+
+    public static int allKindsOfNodeDepths1(BinaryTree root) {
+        if(root == null) return 0;
+        Queue<BinaryTree> queue = new LinkedList<>();
+        int sum = 0;
+        int depth = -1;
+        queue.add(root);
+        while (!queue.isEmpty()){
+            depth += 1;
+            int size = queue.size();
+            for(int i=0; i<size; i++) {
+                int contribution = (depth * (depth + 1)) / 2;
+                sum += contribution;
+                BinaryTree node = queue.poll();
+                if (node.left != null) queue.add(node.left);
+                if (node.right !=null) queue.add(node.right);
+            }
+        }
+        return sum;
+    }
+
+
+}
+
 
 

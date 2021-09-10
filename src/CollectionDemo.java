@@ -64,9 +64,6 @@ class Model {
 }
 class ArrayLists{
 
-
-
-
     public int[] arrayListToInt(ArrayList<Integer> arrayList){
         return arrayList.stream().mapToInt(i->i).toArray();
     }
