@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CollectionJava.iml" filepath="$PROJECT_DIR$/CollectionJava.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AlgoExpert-Coding-Problems.iml" filepath="$PROJECT_DIR$/AlgoExpert-Coding-Problems.iml" />
     </modules>
   </component>
 </project>

@@ -2,7 +2,7 @@ import java.util.*;
 
 public class DynamicProgramming {
     public static void main(String[] args) {
-        // Push check
+        
 
         StringBuilder strr = new StringBuilder("AAAAA");
         strr.append('R');
