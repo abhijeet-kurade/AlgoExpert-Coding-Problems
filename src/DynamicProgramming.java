@@ -2,6 +2,11 @@ import java.util.*;
 
 public class DynamicProgramming {
     public static void main(String[] args) {
+        // Push check
+
+        StringBuilder strr = new StringBuilder("AAAAA");
+        strr.append('R');
+        System.out.println(String.valueOf(strr));
         DynamicProgramming dp = new DynamicProgramming();
 
         //System.out.println(dp.maxSumIncreasingSubsequence(new int[]{-5, -2, 5, 3, 7, 6, -1}));
@@ -22,10 +27,16 @@ public class DynamicProgramming {
         int[][] items = new int[][] {
                 {1, 2},{5,6},{1,9},{4,3},{6,7},{8,5}
         };
-        System.out.println(dp.knapsackProblem(items, 10));
+        //System.out.println(dp.knapsackProblem(items, 10));
 
+        int[] arr = {-8, -9, -1, -7, -2};
+        //System.out.println(dp.maxSubsetSumNoAdjacentAtLeastOne(arr));
+        String str = "(()(()()()(((()())()))))))()";
 
-
+        String str1 = "ABHIJEETTPS";
+        String str2 = "ABCJEETFTP";
+        //System.out.println(dp.editingString(str1, str2));
+        //System.out.println(dp.regExMatching("ABHIJEET", "A.HI.*E."));
 
     }
 
@@ -40,7 +51,7 @@ public class DynamicProgramming {
 
         for(int i=1; i<len+1; i++){
             for(int j=1; j< sum+1; j++){
-                if(arr[i-1]>j) dp[i][j] = dp[i-1][j];
+                if(j < arr[i-1]) dp[i][j] = dp[i-1][j];
                 else if(arr[i-1]==j) dp[i][j] = true;
                 else dp[i][j] = dp[i-1][j] || dp[i-1][j-arr[i-1]];
             }
@@ -53,7 +64,8 @@ public class DynamicProgramming {
             if(i==0) System.out.print(0 + "  ");
             else System.out.print(arr[i-1] + "  ");
             for(int j=0; j<sum+1;j++){
-                System.out.print(dp[i][j] ? "T  " : "F  ");
+                String s = j>9 ?"   ":"  ";
+                System.out.print((dp[i][j] ? "T" : "F")+s );
             }
             System.out.println();
         }
@@ -81,7 +93,6 @@ public class DynamicProgramming {
         }
         return max_sum;
     }
-
     int longestValidParentheses(String str){
         int len = str.length();
         if(len < 2) return 0;
@@ -121,9 +132,7 @@ public class DynamicProgramming {
         return longest;
     }
     public int lengthOfLongestSequence(int[] arr){
-
         int len = arr.length;
-
         HashMap<Integer, Boolean> map = new HashMap<>();
         for(int i : arr)
             map.put(i, true);
@@ -170,8 +179,33 @@ public class DynamicProgramming {
         return  answer;
     }
     public int maxSubsetSumNoAdjacent(int[] nums){
+        if(nums.length == 0) return 0;
+        if(nums.length == 1) return nums[0];
+        int second_last = 0;
+        int last_num = 0;
 
-        return -1;
+        for(int i=1; i<nums.length; i++){
+            int sum = nums[i] + second_last;
+            second_last = last_num;
+            last_num = Math.max(second_last, sum);
+        }
+        return last_num;
+    }
+    public int maxSubsetSumNoAdjacentAtLeastOne(int[] nums){
+        if(nums.length == 0) return 0;
+        if(nums.length == 1) return nums[0];
+        if(nums.length == 2) return Math.max(nums[0], nums[1]);
+        int second_last = nums[0];
+        int last_num = Math.max(nums[0], nums[1]);
+
+        for(int i=2; i<nums.length; i++){
+            System.out.println(second_last +" " + last_num);
+            int sum = nums[i] + second_last;
+            second_last = last_num;
+            last_num = Math.max(second_last, Math.max(nums[i], sum));
+        }
+        System.out.println(second_last +" " + last_num);
+        return last_num;
     }
     public int minCoinsChange(int[] coins, int amount){
         int[] dp = new int[amount+1];
@@ -191,7 +225,16 @@ public class DynamicProgramming {
         }
         return dp[amount] != Integer.MAX_VALUE ? dp[amount] : -1;
     }
-
+    public int numberOfWaysToMakeChange(int[] coins, int amount){
+        int[] ways = new int[amount+1];
+        ways[0] = 1;
+        for(int coin : coins){
+            for(int i= coin; i<=amount; i++){
+                ways[i] += ways[i-coin];
+            }
+        }
+        return ways[amount];
+    }
     public int levenshteinDistance(String str1, String str2) {
 
         int len1 = str1.length();
@@ -217,7 +260,6 @@ public class DynamicProgramming {
         }
         return dp[len1][len2];
     }
-
     public ArrayList<String> editingString(String source, String target){
 
         ArrayList<String> edits = new ArrayList<>();
@@ -281,9 +323,7 @@ public class DynamicProgramming {
                 }
                 break;
             }
-
             //System.out.println(source.charAt(j-1) + " " + target.charAt(i-1) );
-
 
             if(source.charAt(j-1) == target.charAt(i-1)){
                 edits.add(String.valueOf(source.charAt(j-1)));
@@ -301,17 +341,23 @@ public class DynamicProgramming {
                 }
             }
         }
-        int l = edits.size();
+
+        Collections.reverse(edits);
+        /*int l = edits.size();
         for (int ii=0; ii<l/2; ii++){
             String temp = edits.get(ii);
             edits.set(ii, edits.get(l-1-ii));
             edits.set(l-1-ii, temp);
-        }
+        }*/
 
         return edits;
     }
-
     public boolean regExMatching(String str, String pattern){
+        /*
+         * Given a input string and pattern implement wildcard match for * where
+         *   '*' - any number of precedence character
+         *   '.' - any one character
+         * */
         int n = str.length();
         int m = pattern.length();
         boolean[][] dp = new boolean[n+1][m+1];
@@ -345,12 +391,11 @@ public class DynamicProgramming {
         }*/
         return dp[n][m];
     }
-
-
     public boolean wildcardPatternMatching(String str, String pattern){
         /*
         * Given a input string and pattern implement wildcard match for * where
         *   '*' - any number of any characters
+        *   '?' - any one character
         * */
         int m = str.length();
         int n = pattern.length();
@@ -518,30 +563,30 @@ public class DynamicProgramming {
 
         for(int i=1; i<len; i++){
             int num = arr[i];
-            if(num <=0){
+            if(num <= 0){
                 prev_index[i] = -1;
                 max_sum[i] = arr[i];
                 if(maximum_sum < max_sum[i]){
-                    maximum_sum = Math.max(maximum_sum, max_sum[i]);
+                    maximum_sum = max_sum[i];
                     maximum_sum_index = i;
                 }
                 continue;
             }
 
             int greatest_sum = Integer.MIN_VALUE;
-            int greatest_sum_idex = -1 ;
+            int greatest_sum_idx = -1 ;
             for(int j=0; j<i; j++){
                 if(arr[j] < num && arr[j] > 0){
                     if(max_sum[j] > greatest_sum){
                         greatest_sum = max_sum[j];
-                        greatest_sum_idex = j;
+                        greatest_sum_idx = j;
                     }
                 }
             }
 
-            if(greatest_sum_idex != -1){
-                max_sum[i] = max_sum[greatest_sum_idex] + arr[i];
-                prev_index[i] = greatest_sum_idex;
+            if(greatest_sum_idx != -1){
+                max_sum[i] = max_sum[greatest_sum_idx] + arr[i];
+                prev_index[i] = greatest_sum_idx;
             }
             else{
                 max_sum[i] = arr[i];
@@ -561,7 +606,6 @@ public class DynamicProgramming {
             mx_sm_val.add(arr[index]);
             index = prev_index[index];
         }
-        ArrayList<Character> charss = new ArrayList<>();
         Collections.reverse(mx_sm_val);
         return new ArrayList<List<Integer>>() {
             {

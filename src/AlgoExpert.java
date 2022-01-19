@@ -1183,7 +1183,8 @@ class AlgoExpertLinkedList{
         LinkedList slow = head;
         LinkedList fast = head;
 
-        while(fast != null && fast.next != null){
+        while(
+                fast != null && fast.next != null){
             slow = slow.next;
             fast = fast.next.next;
         }
@@ -2163,6 +2164,26 @@ class AlgoExpertBST{
     }
 
 
+}
+
+
+class AlgoExpertDynamicProgramming{
+    public static int maxSubsetSumNoAdjacent(int[] array) {
+        int len = array.length;
+
+        if(len <= 2) return len == 0 ? 0 : len == 1 ? array[0] : Math.max(array[0], array[1]);
+
+        int second = array[0];
+        int first = Math.max(array[0], array[1]);
+
+        for(int i=2; i<len; i++){
+            int num = array[i];
+            int current = Math.max(second + num, first);
+            second = first;
+            first = current;
+        }
+        return first;
+    }
 }
 
 

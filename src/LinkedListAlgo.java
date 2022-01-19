@@ -226,8 +226,26 @@ class LinkedLists{
         if(one == null) previous.next = two;
         return headOne.val < headTwo.val ? headOne : headTwo;
     }
+    public static ListNode mergeLinkedLists1(ListNode headOne, ListNode headTwo) {
+        ListNode prev = null;
+        ListNode one = headOne;
+        ListNode two = headTwo;
 
-
+        while(one != null && two != null){
+            if(one.val<two.val ){
+                prev = one;
+                one = one.next;
+            }
+            else{
+                if(prev != null) prev.next = two;
+                prev = two;
+                two = two.next;
+                prev.next = one;
+            }
+        }
+        if(one == null) prev.next = two;
+        return headOne.val < headTwo.val ? headOne : headTwo;
+    }
     public ListNode reverseKGroup(ListNode head, int k) {
 
         ListNode dummyNode = new ListNode(-1);
@@ -256,7 +274,6 @@ class LinkedLists{
         return dummyNode.next;
     }
     public ListNode reverseLinkedList(ListNode currentNode, ListNode prev) {
-
         ListNode prevNode = prev;
         prev = null;
         while(currentNode.next != null) {
@@ -266,10 +283,8 @@ class LinkedLists{
             currentNode = temp;
         }
         currentNode.next = prev;
-
         ListNode tailNode = prevNode.next;
         prevNode.next = currentNode;
-
         return tailNode;
     }
     public ListNode reverseKGroup1(ListNode head, int k) {

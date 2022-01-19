@@ -614,19 +614,33 @@ class BTree{
         return root;
     }
 
+
+
     public void inorderBTreeTraversalIterative(BTreeNode root){
         BTreeNode node = root;
         Stack<BTreeNode> stack = new Stack<>();
-        //int count=0;
         while( node != null || stack.size() > 0 ){
             while(node != null){
                 stack.push(node);
-                //count++;
                 node = node.left;
             }
             node = stack.pop();
             System.out.println(node.val);
             node =node.right;
+        }
+    }
+
+    public void inorderBTreeTraversalIterative1(BTreeNode root){
+        BTreeNode node = root;
+        Stack<BTreeNode> stack = new Stack<>();
+        while(node != null || !stack.isEmpty()){
+            while(node != null){
+                stack.push(node);
+                node = node.left;
+            }
+            node = stack.pop();
+            System.out.println(node.val);
+            node = node.right;
         }
     }
 
@@ -787,6 +801,34 @@ class BTree{
 
         return new int[]{ 0, Math.max(left[1], right[1]) +1 };
 
+    }
+
+    public static boolean leafOrderTraversal(BTreeNode nodeOne, BTreeNode nodeTwo){
+        Stack<BTreeNode> stkOne = new Stack<>();
+        Stack<BTreeNode> stkTwo = new Stack<>();
+
+        nodeOne = getNextLeafNode(nodeOne, stkOne);
+        nodeTwo = getNextLeafNode(nodeTwo, stkTwo);
+        while(true){
+            if(nodeOne == null && nodeTwo == null)  break;
+            if(nodeOne != null || nodeTwo != null || nodeOne.val != nodeTwo.val) return false;
+            nodeOne = getNextLeafNode(null, stkOne);
+            nodeTwo = getNextLeafNode(null, stkTwo);
+        }
+        return true;
+    }
+
+    public static BTreeNode getNextLeafNode(BTreeNode node, Stack<BTreeNode> stack){
+        while(node != null || !stack.isEmpty()){
+            while(node != null){
+                stack.add(node);
+                node = node.left;
+            }
+            node = stack.pop();
+            if(node.left == null || node.right == null) return node;
+            node = node.right;
+        }
+        return null;
     }
 
 
