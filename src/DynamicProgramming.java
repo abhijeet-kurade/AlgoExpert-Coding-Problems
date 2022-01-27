@@ -1,13 +1,27 @@
 import java.util.*;
 
 public class DynamicProgramming {
-    public static void main(String[] args) {
-        
 
-        StringBuilder strr = new StringBuilder("AAAAA");
+    static class Node {
+        int val;
+        Node next;
+    }
+    public Node mergerList(int[] listOne, int[] listTwo){
+
+
+
+        return null;
+    }
+
+
+    public static void main(String[] args) {
+        DynamicProgramming dp = new DynamicProgramming();
+        // Waiting for the question.
+
+        /*StringBuilder strr = new StringBuilder("AAAAA");
         strr.append('R');
         System.out.println(String.valueOf(strr));
-        DynamicProgramming dp = new DynamicProgramming();
+        DynamicProgramming dp = new DynamicProgramming();*/
 
         //System.out.println(dp.maxSumIncreasingSubsequence(new int[]{-5, -2, 5, 3, 7, 6, -1}));
         //System.out.println(dp.wildcardPatternMatching("abfdggbbab", "*b"));
@@ -24,20 +38,85 @@ public class DynamicProgramming {
             System.out.println();
         }*/
 
-        int[][] items = new int[][] {
+        /*int[][] items = new int[][] {
                 {1, 2},{5,6},{1,9},{4,3},{6,7},{8,5}
-        };
+        };*/
         //System.out.println(dp.knapsackProblem(items, 10));
 
-        int[] arr = {-8, -9, -1, -7, -2};
+        //int[] arr = {-8, -9, -1, -7, -2};
         //System.out.println(dp.maxSubsetSumNoAdjacentAtLeastOne(arr));
-        String str = "(()(()()()(((()())()))))))()";
 
+        /*
+        String str = "(()(()()()(((()())()))))))()";
         String str1 = "ABHIJEETTPS";
         String str2 = "ABCJEETFTP";
-        //System.out.println(dp.editingString(str1, str2));
-        //System.out.println(dp.regExMatching("ABHIJEET", "A.HI.*E."));
+        */
 
+        //System.out.println(dp.editingString(str1, str2));
+        System.out.println(dp.regExMatching("googler", "g.*o*.g.*"));
+
+        /*int[] arr = {2, 1, 5};
+        numberOfWaysToMakeChange(arr, 15);*/
+
+        //System.out.println(minNumberOfJumps(new int[]{1, 4, 2, 1, 2, 3, 7, 1, 1, 1, 3}));
+
+
+    }
+
+    public boolean regExMatching(String str, String pattern){
+        /*
+         * Given a input string and pattern implement wildcard match for * where
+         *   '*' - any number of precedence character
+         *   '.' - any one character
+         * */
+        int n = str.length();
+        int m = pattern.length();
+        boolean[][] dp = new boolean[n+1][m+1];
+        dp[0][0] = true;
+        for(int j=1; j<=m; j++) {
+            if(pattern.charAt(j-1) == '*') dp[0][j] = dp[0][j-2];
+        }
+        for(int i=1; i<=n; i++){
+            for(int j=1; j<=m; j++){
+                if(pattern.charAt(j-1) == '.' || str.charAt(i-1) == pattern.charAt(j-1))
+                    dp[i][j] = dp[i-1][j-1];
+                else if (pattern.charAt(j-1) == '*'){
+                    /*
+                     *  pattern.charAt(j-1) = current pattern character
+                     * pattern.charAt(j-2) = last pattern character
+                     *  str.charAt(i-1) = current string character                    *
+                     * 
+                     * dp[i][j] = false;
+                     * boolean ans_without_curr_char = dp[i-1][j];
+                     * if(dp[i][j-2] == true) dp[i][j] = true;
+                     * else if(pattern.charAt(j-2) == '.') dp[i][j] = ans_without_curr_char;
+                     * else if(str.charAt(i-1) == pattern.charAt(j-2))) dp[i][j] = ans_without_curr_char;
+                     *
+                     * */
+                    dp[i][j] = dp[i][j-2] ?  true :
+                            (pattern.charAt(j-2) == '.' || str.charAt(i-1) == pattern.charAt(j-2)) ? dp[i-1][j] : false;
+                }
+                else
+                    dp[i][j] = false;
+            }
+        }
+        System.out.print("    ");
+        for(int j=0; j<m; j++) System.out.print(pattern.charAt(j) + " ");
+        System.out.println();
+        for(int i=0; i<=n; i++){
+            if (i==0) System.out.print("  ");
+            else System.out.print(str.charAt(i-1) + " ");
+            for(int j=0; j<=m; j++){
+                System.out.print(dp[i][j] ? "T " : "F" + " ");
+            }
+            System.out.println();
+        }
+        return dp[n][m];
+    }
+
+    public static void printArr(int[] arr){
+        for(int i=0; i<arr.length; i++) System.out.print(arr[i]+"   ");
+        System.out.println();
     }
 
     public boolean subsetSum(int[] arr, int sum){
@@ -225,13 +304,14 @@ public class DynamicProgramming {
         }
         return dp[amount] != Integer.MAX_VALUE ? dp[amount] : -1;
     }
-    public int numberOfWaysToMakeChange(int[] coins, int amount){
+    public static  int numberOfWaysToMakeChange(int[] coins, int amount){
         int[] ways = new int[amount+1];
         ways[0] = 1;
         for(int coin : coins){
             for(int i= coin; i<=amount; i++){
                 ways[i] += ways[i-coin];
             }
+            printArr(ways);
         }
         return ways[amount];
     }
@@ -261,6 +341,9 @@ public class DynamicProgramming {
         return dp[len1][len2];
     }
     public ArrayList<String> editingString(String source, String target){
+        /*
+        * You can only add or remove character and that will consider as one operation
+        * */
 
         ArrayList<String> edits = new ArrayList<>();
         int sourceLen = source.length();
@@ -352,44 +435,48 @@ public class DynamicProgramming {
 
         return edits;
     }
-    public boolean regExMatching(String str, String pattern){
-        /*
-         * Given a input string and pattern implement wildcard match for * where
-         *   '*' - any number of precedence character
-         *   '.' - any one character
-         * */
-        int n = str.length();
-        int m = pattern.length();
-        boolean[][] dp = new boolean[n+1][m+1];
-        dp[0][0] = true;
-        for(int j=1; j<=m; j++) {
-            if(pattern.charAt(j-1) == '*') dp[0][j] = dp[0][j-2];
+    public static int minNumberOfJumps(int[] array) {
+        int len = array.length;
+        if(len <= 1) return 0;
+        int jumps=0;
+        int nextMaxJump = array[0];
+        int index=0;
+        while(index < len){
+            jumps++;
+            int lastMaxJump = nextMaxJump;
+            if(nextMaxJump >= len-1 ) break;
+            int nextJumps = nextMaxJump - index;
+            for(int i=0; i<nextJumps; i++){
+                index++;
+                nextMaxJump = Math.max(nextMaxJump, array[index]+index);
+            }
+            if(lastMaxJump == nextMaxJump) return -1;
         }
-        for(int i=1; i<=n; i++){
-            for(int j=1; j<=m; j++){
-                if(pattern.charAt(j-1) == '.' || str.charAt(i-1) == pattern.charAt(j-1))
-                    dp[i][j] = dp[i-1][j-1];
-                else if (pattern.charAt(j-1) == '*'){
+        return jumps;
+    }
+    public static int waterArea(int[] heights) {
+        int n = heights.length;
+        if(n<3) return 0;
 
-                    dp[i][j] = dp[i][j-2] ?  true :
-                              (pattern.charAt(j-2) == '.' || str.charAt(i-1) == pattern.charAt(j-2)) ? dp[i-1][j] : false;
-                }
-                else
-                    dp[i][j] = false;
-                }
+        int leftMin= heights[0], rightMax = heights[n-1];
+        int left = 1, right = n-2;
+        int water = 0;
+
+        while(left <= right){
+            int min = Math.min(leftMin, rightMax);
+            if(min == leftMin){
+                water += leftMin > heights[left] ? leftMin - heights[left] : 0;
+                leftMin = Math.max(leftMin, heights[left]);
+                left += 1;
             }
-        /*System.out.print("  ");
-        for(int j=0; j<m; j++) System.out.print(pattern.charAt(j) + " ");
-        System.out.println();
-        for(int i=0; i<=n; i++){
-            if (i==0) System.out.print("  ");
-            else System.out.print(str.charAt(i-1) + " ");
-            for(int j=0; j<=m; j++){
-                System.out.print(dp[i][j] ? "T " : "F" + " ");
+            else{
+                water += rightMax > heights[right] ? rightMax - heights[right] : 0;
+                rightMax = Math.max(rightMax, heights[right]);
+                right += -1;
             }
-            System.out.println();
-        }*/
-        return dp[n][m];
+        }
+        return water;
+
     }
     public boolean wildcardPatternMatching(String str, String pattern){
         /*
@@ -489,7 +576,7 @@ public class DynamicProgramming {
         //System.out.println("Started");
         int len = arr.length;
 
-        ArrayList<Integer>  prev_indices = new ArrayList<>();
+        ArrayList<Integer> prev_indices = new ArrayList<>();
         ArrayList<Integer> best_sequence_values = new ArrayList<>();
         ArrayList<Integer> best_sequence_indices = new ArrayList<>();
 
