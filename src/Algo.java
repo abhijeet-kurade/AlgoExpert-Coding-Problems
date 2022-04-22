@@ -30,7 +30,7 @@ public class Algo {
         Algo algo = new Algo();
     }
 
-    public void sortObjectClass(){
+    public void sortStringObjectClass(){
         List<Word> words = new ArrayList<>();
         String[] strs = new String[]{"zx", "xza", "abk", "kba", "obj", "jbo", "object", "jectob", "bak"};
 
@@ -42,7 +42,7 @@ public class Algo {
                 int lim= Math.min(o1.str1.length(), o2.str1.length());
                 int k=0;
                 while(k<lim) {
-                    if(o1.str1.charAt(k)!= o2.str1.charAt(k)) {
+                    if(o1.str1.charAt(k) != o2.str1.charAt(k)) {
                         return (int) o1.str1.charAt(k) - o2.str1.charAt(k);
                     }
                     k++;
@@ -88,12 +88,12 @@ public class Algo {
         int first = -1;
         int second = -1;
         for(int i = 0; i<len-1; i++){
-            outerloop:
+            outerLoop:
             for(int j=i+1; j<len; j++){
                 if(str.charAt(i) < str.charAt(j)){
                     first = i;
                     second = j;
-                    break outerloop;
+                    break outerLoop;
                 }
             }
         }
